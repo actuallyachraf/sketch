@@ -1,5 +1,9 @@
 # sketch
 
+![Go Report Card](https://goreportcard.com/badge/github.com/actuallyachraf/sketch)
+
+---
+
 `sketch` is a Go package that provides implementations for probabilistic data structures.
 
 The implementations are based largely on literature and are a bit hacky, I don't recommend using
