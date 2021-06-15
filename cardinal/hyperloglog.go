@@ -10,7 +10,7 @@ import (
 	"math/bits"
 	"math/rand"
 
-	inthash "github.com/actuallyachraf/sketch/hash"
+	"github.com/actuallyachraf/sketch/inthash"
 )
 
 const (

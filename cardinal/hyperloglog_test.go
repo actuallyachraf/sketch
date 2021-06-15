@@ -45,9 +45,10 @@ func TestHyperLogLog(t *testing.T) {
 			errCount += 1
 		}
 		avgErr = errRate / errCount
-		t.Log(avgErr)
-		t.Log(std)
-		t.Log(h.Cardinal())
+		if avgErr > std {
+			t.Logf("Register Count [%d] accuracy lower than expected ", 5)
+		}
+		t.Logf("Dataset Size %d | Exact Cardinality : %d | Estimated Cardinality %d", 100000, 100, h.Cardinal())
 	})
 	t.Run("TestHyperLogLogEstimate-8", func(t *testing.T) {
 		h, err := NewHyperLogLog(8)
@@ -67,10 +68,10 @@ func TestHyperLogLog(t *testing.T) {
 			errRate += math.Abs(float64(cardinality-h.Cardinal())) / float64(cardinality)
 			errCount += 1
 		}
-		avgErr = (errRate / errCount) / 100
-		t.Log(avgErr)
-		t.Log(std)
-		t.Log(h.Cardinal())
+		if avgErr > std {
+			t.Logf("Register Count [%d] accuracy lower than expected ", 8)
+		}
+		t.Logf("Dataset Size %d | Exact Cardinality : %d | Estimated Cardinality %d", 100000, 1000, h.Cardinal())
 	})
 }
 func BenchmarkHyperLogLog(b *testing.B) {

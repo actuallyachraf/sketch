@@ -66,3 +66,20 @@ func TestLinearCounter(t *testing.T) {
 		t.Log("Estimated number of unique entries", estimate)
 	})
 }
+
+func BenchmarkLinearCounter(b *testing.B) {
+	b.Run("BenchmarkLinearCounter-5329", func(b *testing.B) {
+		lc := NewLinearCounter(5329)
+		for k := 0; k < b.N; k++ {
+			m := rand.Intn(1000)
+			lc.Add(m)
+		}
+	})
+	b.Run("BenchmarkLinearCounter-5329", func(b *testing.B) {
+		lc := NewLinearCounter(268)
+		for k := 0; k < b.N; k++ {
+			m := rand.Intn(1000)
+			lc.Add(m)
+		}
+	})
+}

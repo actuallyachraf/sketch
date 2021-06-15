@@ -6,7 +6,6 @@ func TestBitset(t *testing.T) {
 	t.Run("TestSetClearIsSetBit", func(t *testing.T) {
 		b := New(100)
 		for k := 0; k < 100; k++ {
-			t.Logf("Case #%d", k)
 			err := b.Set(k)
 			if err != nil {
 				t.Fatal("failed to set bit with error :", err)

@@ -3,12 +3,12 @@
 package cardinal
 
 import (
+	"encoding/binary"
 	"hash"
 	"hash/fnv"
 	"math"
 
 	"github.com/actuallyachraf/sketch/bitset"
-	inthash "github.com/actuallyachraf/sketch/hash"
 )
 
 // LinearCounter is a simple map(hash(value) => bit) and
@@ -32,8 +32,12 @@ func NewLinearCounter(m int) LinearCounter {
 
 // Add an item to the linear counter
 func (lc *LinearCounter) Add(item int) error {
-
-	pos := inthash.FNVHashInt32(int32(item))
+	x := uint32(item)
+	buf := make([]byte, 4)
+	binary.LittleEndian.PutUint32(buf, x)
+	posBytes := lc.h.Sum(buf)
+	pos := binary.LittleEndian.Uint32(posBytes)
+	lc.h.Reset()
 	if !lc.bitvec.IsSet(int(pos)) {
 		return lc.bitvec.Set(int(pos))
 	}
