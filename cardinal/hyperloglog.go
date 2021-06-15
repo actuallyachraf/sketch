@@ -35,10 +35,10 @@ func NewHyperLogLog(precision int) (*HyperLogLog, error) {
 	if precision < 4 || precision > 16 {
 		return nil, errors.New("precision has to be in range 4..16")
 	}
-	numCounters := 1 << precision
+	var numCounters uint32 = 1 << precision
 	return &HyperLogLog{
 		precision:   precision,
-		numCounters: uint32(numCounters),
+		numCounters: numCounters,
 		size:        32 - precision,
 		counter:     make([]int, numCounters),
 		seed:        rand.Uint32(),
@@ -53,60 +53,35 @@ func (h *HyperLogLog) Rank(value uint32) int {
 }
 
 // Add indexes an element into the counter.
-func (h *HyperLogLog) Add(item int) {
+func (h *HyperLogLog) Add(item int32) {
 	itemHash := inthash.FNVHashInt32(int32(item))
-	value, counterIdx := divmod(itemHash, int32(h.numCounters))
-	h.counter[counterIdx] = max(h.counter[counterIdx], h.Rank(uint32(value)))
+	value := 32 - h.precision
+	r := leftmostActiveBit(itemHash << uint32(h.precision))
+	j := itemHash >> uint(value)
+
+	if r > h.counter[j] {
+		h.counter[j] = r
+	}
 }
 
 // Cardinal approximately counts the number of unique elements
 // indexed by the HyperLogLog counter.
-func (h *HyperLogLog) Cardinal() float64 {
-	var R float64 = 0.
-	var allZero bool = true
-	var numCounters float64 = float64(h.numCounters)
-
-	for counterIdx := 0; counterIdx < int(h.numCounters); counterIdx++ {
-		if h.counter[counterIdx] > 0 {
-			allZero = false
-		}
-		R += 1. / float64(uint32(1)<<h.counter[counterIdx])
+func (h *HyperLogLog) Cardinal() int {
+	sum := 0.
+	m := float64(h.numCounters)
+	for _, v := range h.counter {
+		sum += math.Pow(math.Pow(2, float64(v)), -1)
 	}
-
-	if allZero {
-		return 0
-	}
-	n := math.Round(h.alpha * numCounters * numCounters / R)
-	Z := 0.
-	if n < 2.5*numCounters {
-		for counterIdx := 0; counterIdx < int(h.numCounters); counterIdx++ {
-			if h.counter[counterIdx] == 0 {
-				Z += 1
-			}
-		}
-		if Z > 0 {
-			return math.Round(numCounters*math.Log(numCounters) - math.Log(Z))
-		}
-	} else if n > UpperCorrectionThreshold {
-		n = math.Round(-44294967296. * math.Log(1-(n/4294967296.)))
-	}
-	return n
+	estimate := h.alpha * m * m / sum
+	return int(estimate)
 }
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func divmod(a, b int32) (quo, rem int32) {
-	return a / b, a % b
+func leftmostActiveBit(x uint32) int {
+	return 1 + bits.LeadingZeros32(x)
 }
 
 // Weight computes the weight for the cardinality estimators
 // based on the counters.
-func Weight(numCounters int) float64 {
+func Weight(numCounters uint32) float64 {
 	if numCounters < 16 {
 		return 0.673
 	} else if numCounters < 32 {

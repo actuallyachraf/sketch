@@ -25,7 +25,6 @@ func TestHyperLogLog(t *testing.T) {
 		h.Add(2)
 		h.Add(3)
 		h.Add(4)
-		t.Log(h.alpha)
 	})
 	t.Run("TestHyperLogLogEstimate-FNV1a", func(t *testing.T) {
 		h, err := NewHyperLogLog(10)
@@ -35,20 +34,19 @@ func TestHyperLogLog(t *testing.T) {
 		precShift := 1 << h.precision
 		std := 1.04 / math.Sqrt(float64(precShift))
 
-		cardinality := 100.
+		cardinality := 100
+		avgErr := 0.
 		errRate := 0.
 		errCount := 0.
-		avgErr := 0.
 		for i := 0; i < 100000; i++ {
-			k := rand.Intn(100)
+			k := rand.Int31n(100)
 			h.Add(k)
-
-			errRate += (cardinality - h.Cardinal()) / float64(cardinality)
+			errRate += math.Abs(float64(cardinality-h.Cardinal())) / float64(cardinality)
 			errCount += 1
 		}
-		avgErr = math.Abs(errRate) / errCount
-
+		avgErr = errRate / errCount
 		t.Log(avgErr)
-		t.Log(avgErr <= std)
+		t.Log(std)
+		t.Log(h.Cardinal())
 	})
 }
