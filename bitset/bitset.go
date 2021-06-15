@@ -8,15 +8,17 @@ import (
 
 // Bitset represents a bitset of fixed length
 type Bitset struct {
-	bitvec []int32
-	length int
+	bitvec    []int32
+	length    int
+	bitlength int
 }
 
 // New creates a new bitset instance with length l.
 func New(l int) Bitset {
 	return Bitset{
-		bitvec: make([]int32, l),
-		length: (l / 32) + 1,
+		bitvec:    make([]int32, l),
+		length:    (l / 32) + 1,
+		bitlength: l,
 	}
 }
 
@@ -68,4 +70,28 @@ func (b *Bitset) IsSet(pos int) bool {
 
 	flag = flag << int32(bpos)
 	return (b.bitvec[rpos] & flag) != 0
+}
+
+// Count returns the number of set bits
+func (b *Bitset) Count() int {
+	bitlen := b.bitlength
+	count := 0
+	for i := 0; i < bitlen; i++ {
+		if b.IsSet(i) {
+			count++
+		}
+	}
+	return count
+}
+
+// SetBits returns a list of indices of bits that are set.
+func (b *Bitset) SetBits() []int {
+	bitlen := b.bitlength
+	indices := make([]int, 0, b.bitlength)
+	for i := 0; i < bitlen; i++ {
+		if b.IsSet(i) {
+			indices = append(indices, i)
+		}
+	}
+	return indices
 }
