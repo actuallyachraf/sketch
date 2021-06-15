@@ -22,10 +22,8 @@ func New(l int) Bitset {
 	}
 }
 
-// BitLength
 // Set will set a bit at pos.
 func (b *Bitset) Set(pos int) error {
-	var flag int32 = 1
 	if pos < 0 || pos >= b.length*32 {
 		return fmt.Errorf("invalid position for bitset of length %d", b.length)
 	}
@@ -37,7 +35,7 @@ func (b *Bitset) Set(pos int) error {
 	rpos := pos / 32 // (relative position inside the integer slice)
 	bpos := pos % 32 // (local bit position inside bitvec[rpos])
 
-	flag = 1 << bpos
+	flag := int32(1) << bpos
 	b.bitvec[rpos] = b.bitvec[rpos] | flag
 
 	return nil

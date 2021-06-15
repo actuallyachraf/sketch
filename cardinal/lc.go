@@ -13,7 +13,7 @@ import (
 
 // LinearCounter is a simple map(hash(value) => bit) and
 // cardinality can be estimated using n = ~m*ln(V) where
-// m is a paramter choosen based on how much entires we expect
+// m is a parameter chosen based on how much entires we expect
 // and V is the number of 0-set bits.
 type LinearCounter struct {
 	m      int

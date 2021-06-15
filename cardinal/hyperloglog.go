@@ -13,10 +13,6 @@ import (
 	"github.com/actuallyachraf/sketch/inthash"
 )
 
-const (
-	UpperCorrectionThreshold = 143165576. //  2^{32} / 30
-)
-
 // HyperLogLog data structure does cardinality estimation
 // by ranking items according to the LSB bits index.
 type HyperLogLog struct {
