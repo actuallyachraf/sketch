@@ -43,12 +43,9 @@ func (lc *LinearCounter) Add(item int) error {
 }
 
 // Cardinal returns the estimated cardinal of the dataset
-func (lc *LinearCounter) Cardinal(d []int) float64 {
+func (lc *LinearCounter) Cardinal() float64 {
 	var Z float64
 	var m float64 = float64(lc.m)
-	for _, x := range d {
-		lc.Add(x)
-	}
 	for i := 0; i < lc.m; i++ {
 		if !lc.bitvec.IsSet(i) {
 			Z++

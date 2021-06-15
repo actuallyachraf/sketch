@@ -95,3 +95,8 @@ func (b *Bitset) SetBits() []int {
 	}
 	return indices
 }
+
+// BitLength returns length in bits.
+func (b *Bitset) BitLength() int {
+	return b.bitlength
+}
