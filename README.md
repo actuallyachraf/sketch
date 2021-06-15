@@ -23,6 +23,18 @@ and provided by [Ilya Katsov](https://highlyscalable.wordpress.com/2012/05/01/pr
 | 10000000  | 1096582    | 831809      |
 | 100000000 | 8571013    | 7061760     |
 
+For **HyperLogLog** the accuracy-register count trade-offs are based on the estimated cardinality of input.
+The recommend _precision_ value (denoted m) should take small values for < 10e8 entries.
+
+| n         | m (δ = 1%) | m (δ = 10%) |
+| --------- | ---------- | ----------- |
+| 1000      | 4          | 7           |
+| 10000     | 4          | 8           |
+| 100000    | 5          | 10          |
+| 1000000   | 6          | 10          |
+| 10000000  | 7          | 12          |
+| 100000000 | 8          | 14          |
+
 # References
 
 - [A.Gakhov Probabilistic Data Structures](https://www.gakhov.com/books/pdsa.html)
