@@ -6,6 +6,7 @@ import (
 	"errors"
 	"hash"
 	"hash/fnv"
+	"math"
 	"math/bits"
 	"math/rand"
 
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	UpperCorrectionThreshold = 143165576 //  2^{32} / 30
+	UpperCorrectionThreshold = 143165576. //  2^{32} / 30
 )
 
 // HyperLogLog data structure does cardinality estimation
@@ -56,6 +57,40 @@ func (h *HyperLogLog) Add(item int) {
 	itemHash := inthash.FNVHashInt32(int32(item))
 	value, counterIdx := divmod(itemHash, int32(h.numCounters))
 	h.counter[counterIdx] = max(h.counter[counterIdx], h.Rank(uint32(value)))
+}
+
+// Cardinal approximately counts the number of unique elements
+// indexed by the HyperLogLog counter.
+func (h *HyperLogLog) Cardinal() float64 {
+	var R float64 = 0.
+	var allZero bool = true
+	var numCounters float64 = float64(h.numCounters)
+
+	for counterIdx := 0; counterIdx < int(h.numCounters); counterIdx++ {
+		if h.counter[counterIdx] > 0 {
+			allZero = false
+		}
+		R += 1. / float64(uint32(1)<<h.counter[counterIdx])
+	}
+
+	if allZero {
+		return 0
+	}
+	n := math.Round(h.alpha * numCounters * numCounters / R)
+	Z := 0.
+	if n < 2.5*numCounters {
+		for counterIdx := 0; counterIdx < int(h.numCounters); counterIdx++ {
+			if h.counter[counterIdx] == 0 {
+				Z += 1
+			}
+		}
+		if Z > 0 {
+			return math.Round(numCounters*math.Log(numCounters) - math.Log(Z))
+		}
+	} else if n > UpperCorrectionThreshold {
+		n = math.Round(-44294967296. * math.Log(1-(n/4294967296.)))
+	}
+	return n
 }
 
 func max(a, b int) int {

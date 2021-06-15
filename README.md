@@ -1,6 +1,11 @@
 # sketch
 
-`sketch` is a Go package that provides efficient implementations for probabilistic data structures.
+`sketch` is a Go package that provides implementations for probabilistic data structures.
+
+The implementations are based largely on literature and are a bit hacky, I don't recommend using
+them for any reason than _figuring out_ how PDS works.
+
+Better suitable implementations can be found in Github.
 
 # Trade Offs
 
