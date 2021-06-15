@@ -25,7 +25,7 @@ type LinearCounter struct {
 func NewLinearCounter(m int) LinearCounter {
 	return LinearCounter{
 		m:      m,
-		h:      fnv.New64a(),
+		h:      fnv.New32a(),
 		bitvec: bitset.New(m),
 	}
 }
